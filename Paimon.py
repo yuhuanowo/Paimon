@@ -6,8 +6,9 @@ import discord #導入discord.py
 from discord.ext import commands
 import json #導入json
 import random #隨機挑選
-import os 
-import datetime
+import os #cog
+import datetime #系統標準時間
+import asyncio #異步執行
 
 with open("setting.json","r",encoding="utf8") as jfile: #開啟檔案(json)(utf8解碼)
     jdata = json.load(jfile)
@@ -28,16 +29,21 @@ async def on_member_join(member):
     channel = bot.get_channel(int(jdata["Welcome_channel"]))
     await channel.send(F"@{member}join!")
 
+@bot.event#成員退出
+async def on_member_remove(member):
+    channel = bot.get_channel(int(jdata["Welcome_channel"]))
+    await channel.send(F"{member}leave!")
+
+@bot.event #處理指令錯誤
+async def on_command_error(ctx,error):
+    await ctx.send(error)
+
 @bot.event#說出fuck傳fuck
 async def on_message(message):
     if message.content == "fuck"and message.author != bot.user:
         await message.channel.send('fuck')
     await bot.process_commands(message)
 
-@bot.event#成員退出
-async def on_member_remove(member):
-    channel = bot.get_channel(int(jdata["Welcome_channel"]))
-    await channel.send(F"{member}leave!")
 
 @bot.command()#ping
 async def ping(ctx):
@@ -72,6 +78,8 @@ async def say(ctx,*,msg):
 #async def clean(ctx,number:int):
 #    await ctx.channel.purge(limit=number+1)
 #清訊息 先暫停
+
+
 
 
 
